@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - HeartSafe AI 💓</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to right, #ffe6e6, #fff0f5);
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .result, .report {
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        .heart {
+            font-size: 60px;
+            display: inline-block;
+            animation: pulse 1s infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .result.red { background-color: #ffcccc; color: #b30000; }
+        .result.green { background-color: #ccffdd; color: #006600; }
+        .report { background-color: #e6fff2; text-align: left; }
+        .btn-back, .btn-download { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container col-md-6 mx-auto">
+        <h2 class="text-center mb-4">Prediction Result ❤️</h2>
+
+        <!-- Animated Heart -->
+        <div class="heart {{ 'red' if 'Disease' in prediction_text else 'green' }}">
+            {% if 'Disease' in prediction_text %}
+            ❤️
+            {% else %}
+            💚
+            {% endif %}
+        </div>
+
+        <!-- Prediction Result -->
+        <div class="result {{ 'red' if 'Disease' in prediction_text else 'green' }}">
+            <strong>{{ prediction_text }}</strong>
+        </div>
+
+        <!-- Patient Report -->
+        <div class="report" id="report">
+            <h4>🩺 Patient Report</h4>
+            <p><strong>Name:</strong> {{ request.form.get('Name') if request.form.get('Name') else 'Not Provided' }}</p>
+            <p><strong>Email:</strong> {{ request.form.get('Email') if request.form.get('Email') else 'Not Provided' }}</p>
+            <p><strong>Age:</strong> {{ request.form.get('age') }}</p>
+            <p><strong>Sex:</strong> {% if request.form.get('sex')=='1' %}Male{% elif request.form.get('sex')=='0' %}Female{% else %}Not Provided{% endif %}</p>
+            <p><strong>Chest Pain Type:</strong> {{ request.form.get('cp') }}</p>
+            <p><strong>Resting Blood Pressure:</strong> {{ request.form.get('trestbps') }} mm Hg</p>
+            <p><strong>Cholesterol:</strong> {{ request.form.get('chol') }} mg/dl</p>
+            <p><strong>Fasting Blood Sugar >120 mg/dl:</strong> {{ request.form.get('fbs') }}</p>
+            <p><strong>Maximum Heart Rate Achieved:</strong> {{ request.form.get('thalach') }}</p>
+            <p><strong>Exercise Induced Angina:</strong> {{ request.form.get('exang') }}</p>
+        </div>
+
+        <!-- Buttons -->
+        <button class="btn btn-primary btn-download w-100" onclick="downloadPDF()">📄 Download Report PDF</button>
+        <a href="/" class="btn btn-danger btn-back w-100">🔁 Back to Home</a>
+    </div>
+
+    <script>
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const report = document.getElementById("report");
+
+            let text = '';
+            report.querySelectorAll('h4, p').forEach(el => {
+                text += el.textContent + '\n';
+            });
+
+            doc.text(text, 10, 10);
+            doc.save("HeartSafe_Report.pdf");
+        }
+    </script>
+</body>
+</html>

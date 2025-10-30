@@ -1,0 +1,5 @@
+Model,CrossVal_Acc,Test_Acc,ROC_AUC
+XGBoost,0.9687,0.9883,1.0
+Logistic Regression,0.7903,0.7782,0.8578
+KNN,0.7019,0.7198,0.837
+SVM,0.6953,0.6887,0.7121
