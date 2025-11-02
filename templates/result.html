@@ -1,95 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Result - HeartSafe AI 💓</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            background: linear-gradient(to right, #ffe6e6, #fff0f5);
-            font-family: 'Arial', sans-serif;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .result, .report {
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 20px;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-        .heart {
-            font-size: 60px;
-            display: inline-block;
-            animation: pulse 1s infinite;
-            margin-bottom: 10px;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-        .result.red { background-color: #ffcccc; color: #b30000; }
-        .result.green { background-color: #ccffdd; color: #006600; }
-        .report { background-color: #e6fff2; text-align: left; }
-        .btn-back, .btn-download { margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction Result - HeartSafe AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url("{{ url_for('static', filename='ecg-bg.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+      color: #1b1f23;
+    }
+
+    .overlay {
+      background: rgba(255, 255, 255, 0.9);
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #004080 !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #ffffff !important;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-link {
+      color: #ffffff !important;
+      font-weight: 500;
+      margin: 0 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .nav-link:hover {
+      background-color: #ffffff;
+      color: #004080 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+    }
+
+    /* Card */
+    .card {
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border: none;
+      background: #ffffff;
+      padding: 35px;
+      margin-top: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      font-weight: 700;
+      margin-bottom: 25px;
+    }
+
+    /* Result Box */
+    .result {
+      padding: 20px;
+      border-left: 6px solid;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .result.high {
+      border-color: #c62828;
+      background-color: #fdecea;
+      color: #a60000;
+    }
+
+    .result.low {
+      border-color: #2e7d32;
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    /* Report */
+    .report {
+      background: #f9fbfd;
+      padding: 25px;
+      border-radius: 10px;
+      border: 1px solid #d1d9e6;
+    }
+
+    .report h5 {
+      color: #004080;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .report p {
+      font-size: 0.95rem;
+      margin: 6px 0;
+      color: #333;
+    }
+
+    /* Buttons */
+    .btn-group-custom {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+
+    .btn-custom {
+      width: 48%;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 10px 0;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btn-download {
+      background-color: #004080;
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-download:hover {
+      background-color: #0059b3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 64, 128, 0.3);
+    }
+
+    .btn-back {
+      background-color: #ffffff;
+      border: 2px solid #004080;
+      color: #004080;
+    }
+
+    .btn-back:hover {
+      background-color: #004080;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 64, 128, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container col-md-6 mx-auto">
-        <h2 class="text-center mb-4">Prediction Result ❤️</h2>
+  <div class="overlay">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">HeartSafe AI</a>
+        <div class="d-flex">
+          <a href="/" class="nav-link">Home</a>
+        
+        </div>
+      </div>
+    </nav>
 
-        <!-- Animated Heart -->
-        <div class="heart {{ 'red' if 'Disease' in prediction_text else 'green' }}">
-            {% if 'Disease' in prediction_text %}
-            ❤️
+    <!-- Main Container -->
+    <div class="container">
+      <div class="card">
+        <h2>Heart Disease Prediction Result</h2>
+
+        <div class="result {{ 'high' if 'High' in prediction_text else 'low' }}">
+          <h5 class="fw-bold">{{ prediction_text }}</h5>
+          <p class="mb-0">
+            {% if 'High' in prediction_text %}
+              Based on the provided health parameters, there is a high predicted risk of heart disease.  
+              Immediate medical consultation and diagnostic evaluation are recommended.
             {% else %}
-            💚
+              Your parameters indicate a low predicted risk of heart disease.  
+              Maintain a healthy lifestyle and continue with regular check-ups.
             {% endif %}
+          </p>
         </div>
 
-        <!-- Prediction Result -->
-        <div class="result {{ 'red' if 'Disease' in prediction_text else 'green' }}">
-            <strong>{{ prediction_text }}</strong>
-        </div>
-
-        <!-- Patient Report -->
+        <!-- Report -->
         <div class="report" id="report">
-            <h4>🩺 Patient Report</h4>
-            <p><strong>Name:</strong> {{ request.form.get('Name') if request.form.get('Name') else 'Not Provided' }}</p>
-            <p><strong>Email:</strong> {{ request.form.get('Email') if request.form.get('Email') else 'Not Provided' }}</p>
-            <p><strong>Age:</strong> {{ request.form.get('age') }}</p>
-            <p><strong>Sex:</strong> {% if request.form.get('sex')=='1' %}Male{% elif request.form.get('sex')=='0' %}Female{% else %}Not Provided{% endif %}</p>
-            <p><strong>Chest Pain Type:</strong> {{ request.form.get('cp') }}</p>
-            <p><strong>Resting Blood Pressure:</strong> {{ request.form.get('trestbps') }} mm Hg</p>
-            <p><strong>Cholesterol:</strong> {{ request.form.get('chol') }} mg/dl</p>
-            <p><strong>Fasting Blood Sugar >120 mg/dl:</strong> {{ request.form.get('fbs') }}</p>
-            <p><strong>Maximum Heart Rate Achieved:</strong> {{ request.form.get('thalach') }}</p>
-            <p><strong>Exercise Induced Angina:</strong> {{ request.form.get('exang') }}</p>
+          <h5>Patient Report Summary</h5>
+          <p><strong>Name:</strong> {{ request.form.get('Name') or 'Not Provided' }}</p>
+          <p><strong>Email:</strong> {{ request.form.get('Email') or 'Not Provided' }}</p>
+          <p><strong>Age:</strong> {{ request.form.get('age') }}</p>
+          <p><strong>Sex:</strong> {% if request.form.get('sex') == '1' %}Male{% elif request.form.get('sex') == '0' %}Female{% else %}Not Provided{% endif %}</p>
+          <p><strong>Chest Pain:</strong> {{ request.form.get('cp') }}</p>
+          <p><strong>Resting Blood Pressure:</strong> {{ request.form.get('trestbps') }} mm Hg</p>
+          <p><strong>Cholesterol:</strong> {{ request.form.get('chol') }} mg/dl</p>
+          <p><strong>Fasting Blood Sugar >120 mg/dl:</strong> {% if request.form.get('fbs') == '1' %}Yes{% else %}No{% endif %}</p>
+          <p><strong>Maximum Heart Rate Achieved:</strong> {{ request.form.get('thalach') }}</p>
+          <p><strong>Exercise Induced Angina:</strong> {% if request.form.get('exang') == '1' %}Yes{% else %}No{% endif %}</p>
         </div>
 
         <!-- Buttons -->
-        <button class="btn btn-primary btn-download w-100" onclick="downloadPDF()">📄 Download Report PDF</button>
-        <a href="/" class="btn btn-danger btn-back w-100">🔁 Back to Home</a>
+        <div class="btn-group-custom">
+          <button class="btn btn-custom btn-download" onclick="downloadPDF()">Download Report (PDF)</button>
+          <a href="/" class="btn btn-custom btn-back">Back to Home</a>
+        </div>
+      </div>
+
+      <footer>
+        © 2025 HeartSafe AI — Empowering Early Detection and Prevention
+      </footer>
     </div>
+  </div>
 
-    <script>
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const report = document.getElementById("report");
-
-            let text = '';
-            report.querySelectorAll('h4, p').forEach(el => {
-                text += el.textContent + '\n';
-            });
-
-            doc.text(text, 10, 10);
-            doc.save("HeartSafe_Report.pdf");
-        }
-    </script>
+  <script>
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const report = document.getElementById("report");
+      let text = "HeartSafe AI - Patient Report\n\n";
+      report.querySelectorAll('h5, p').forEach(el => {
+        text += el.textContent + '\n';
+      });
+      doc.text(text, 10, 10);
+      doc.save("HeartSafe_Report.pdf");
+    }
+    
+  </script>
 </body>
 </html>
