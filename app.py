@@ -1,5 +1,5 @@
 # ==============================
-# Heart Disease Prediction Web App
+# 💓 Heart Disease Prediction Web App
 # ==============================
 
 from flask import Flask, render_template, request
@@ -9,51 +9,73 @@ import joblib
 # Initialize Flask app
 app = Flask(__name__)
 
-# ========== Load your trained model ==========
+# ========== Load trained XGBoost model ==========
 model = joblib.load("best_model_XGBoost.pkl")
 
-# ========== Home route ==========
+# ========== Home Route ==========
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html')  # main input form page
 
-# ========== Prediction route ==========
+
+# ========== Prediction Route ==========
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # --- Get input values from form ---
-        age = float(request.form['age'])
-        sex = float(request.form['sex'])
+        # --- Collect form inputs safely ---
+        name = request.form.get('Name', 'Not Provided')
+        email = request.form.get('Email', 'Not Provided')
+        age = float(request.form.get('age', 0))
+        sex = float(request.form.get('sex', 0))  # 1 = Male, 0 = Female
 
-        # Chest pain: convert yes/no → numeric
-        cp_input = request.form['cp'].strip().lower()
+        # --- Convert Chest Pain (Yes/No) into numeric ---
+        cp_input = request.form.get('cp', '').strip().lower()
         cp_value = 1 if cp_input == 'yes' else 0
 
-        trestbps = float(request.form['trestbps'])
-        chol = float(request.form['chol'])
-        fbs = float(request.form['fbs'])
-        thalach = float(request.form['thalach'])
-        exang = float(request.form['exang'])
+        # --- Other numeric parameters ---
+        trestbps = float(request.form.get('trestbps', 0))
+        chol = float(request.form.get('chol', 0))
+        fbs = float(request.form.get('fbs', 0))
+        thalach = float(request.form.get('thalach', 0))
+        exang = float(request.form.get('exang', 0))
 
-        # --- Create input array in the same order as model training ---
+        # --- Prepare input for prediction ---
         input_data = np.array([[age, sex, cp_value, trestbps, chol, fbs, thalach, exang]])
 
         # --- Make prediction ---
         prediction = model.predict(input_data)[0]
-        probability = model.predict_proba(input_data)[0][1] * 100  # class 1 probability %
+        probability = model.predict_proba(input_data)[0][1] * 100  # Probability (%)
 
-        # --- Generate readable output ---
+        # --- Interpretation text ---
         if prediction == 1:
             result_text = f"⚠️ High Risk of Heart Disease ({probability:.2f}% likelihood)"
+            risk_color = "danger"
         else:
             result_text = f"💚 Low Risk of Heart Disease ({probability:.2f}% likelihood)"
+            risk_color = "success"
 
-        # --- Render result page ---
-        return render_template('result.html', prediction_text=result_text)
+        # --- Render the result page ---
+        return render_template(
+            'result.html',
+            prediction_text=result_text,
+            risk_color=risk_color,
+            name=name,
+            email=email,
+            age=age,
+            sex='Male' if sex == 1 else 'Female',
+            cp='Yes' if cp_value == 1 else 'No',
+            trestbps=trestbps,
+            chol=chol,
+            fbs=fbs,
+            thalach=thalach,
+            exang=exang
+        )
 
     except Exception as e:
-        return f"Error: {e}"
+        # If any error occurs, display it on the result page
+        return render_template('result.html', prediction_text=f"❌ Error: {str(e)}", risk_color="warning")
 
-# ========== Run the app ==========
+
+# ========== Run the Flask App ==========
 if __name__ == "__main__":
     app.run(debug=True)
