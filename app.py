@@ -1,5 +1,5 @@
 # ==============================
-# 💓 Heart Disease Prediction Web App
+#  Heart Disease Prediction Web App
 # ==============================
 
 from flask import Flask, render_template, request
