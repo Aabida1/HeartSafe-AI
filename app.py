@@ -10,7 +10,7 @@ import joblib
 app = Flask(__name__)
 
 # ========== Load trained XGBoost model ==========
-model = joblib.load("best_model_XGBoost.pkl")
+model = joblib.load("/Users/aabidakhan/Desktop/Minor/final_results/heart_disease_model.pkl")
 
 # ========== Home Route ==========
 @app.route('/')
