@@ -9,8 +9,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: url("{{ url_for('static', filename='ecg-bg.jpg') }}") no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(135deg, #eaf2fb, #f8fbff);
       color: #1b1f23;
     }
 
@@ -84,6 +83,12 @@
       border-color: #2e7d32;
       background-color: #e8f5e9;
       color: #1b5e20;
+    }
+
+    .result.warning {
+      border-color: #b7791f;
+      background-color: #fff8e1;
+      color: #7a4b00;
     }
 
     /* Report */
@@ -172,7 +177,7 @@
       <div class="card">
         <h2>Heart Disease Prediction Result</h2>
 
-        <div class="result {{ 'high' if 'High' in prediction_text else 'low' }}">
+        <div class="result {{ 'high' if risk_color == 'danger' else ('warning' if risk_color == 'warning' else 'low') }}">
           <h5 class="fw-bold">{{ prediction_text }}</h5>
           <p class="mb-0">
             {% if 'High' in prediction_text %}

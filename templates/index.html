@@ -154,7 +154,7 @@
 
   <!-- MAIN CARD: Form + Info -->
   <main class="container">
-    <div class="form-card shadow-sm">
+    <div id="prediction-section" class="form-card shadow-sm">
       <div class="row gx-4 align-items-start">
         <!-- LEFT: FORM -->
         <div class="col-lg-7">
@@ -187,16 +187,18 @@
                 </select>
               </div>
 
-             <!-- Chest Pain -->
-<div class="col-md-6">
-  <label for="cp" class="form-label">Chest Pain</label>
-  <select class="form-select" id="cp" name="cp" required>
-    <option value="" disabled selected>Select</option>
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-  </select>
-  <small class="text-muted">Select <strong>Yes</strong> if you have chest pain; otherwise choose <strong>No</strong>.</small>
-</div>
+              <!-- Chest-pain type uses the four-category encoding from the training dataset. -->
+              <div class="col-md-6">
+                <label for="cp" class="form-label">Chest Pain Type</label>
+                <select class="form-select" id="cp" name="cp" required>
+                  <option value="" disabled selected>Select type...</option>
+                  <option value="0">0 — Typical angina</option>
+                  <option value="1">1 — Atypical angina</option>
+                  <option value="2">2 — Non-anginal pain</option>
+                  <option value="3">3 — Asymptomatic</option>
+                </select>
+                <small class="text-muted">Choose the category recorded in the clinical dataset; if unsure, ask a healthcare professional.</small>
+              </div>
 
 
               <div class="col-md-6">
