@@ -1,4 +1,4 @@
-# HeartSafe AI ❤️
+# HeartSafe AI 
 
 HeartSafe AI is a machine-learning web application that estimates heart-disease risk from selected health indicators. It uses a trained XGBoost model and a Flask interface to collect inputs and display a prediction.
 
